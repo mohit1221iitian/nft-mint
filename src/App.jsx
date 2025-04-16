@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { ethers } from "ethers";
 import ABI from "./assets/abis.json";
+import NFTGallery from "./NFTGallery"; // Correct import for NFTGallery
 
 const contractAddress = "0x8e6Bd6d4557f78F44b75C57873D0eb0627C1a0DF";
 
@@ -46,6 +47,7 @@ function App() {
         <>
           <p>Connected: {account}</p>
           <button onClick={mintNFT}>Mint NFT</button>
+          <NFTGallery account={account} /> {/* Display gallery when connected */}
         </>
       ) : (
         <button onClick={connectWallet}>Connect Wallet</button>
