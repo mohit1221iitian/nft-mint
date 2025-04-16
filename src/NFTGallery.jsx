@@ -17,27 +17,30 @@ function NFTGallery({ account }) {
         const provider = new ethers.providers.Web3Provider(window.ethereum);
         const contract = new ethers.Contract(contractAddress, ABI, provider);
 
-        // Get balance of NFTs for the account
-        const balance = await contract.balanceOf(account);
-        console.log("NFT Balance:", balance.toString()); // Debugging log
+        // Get the next token ID
+        const nextTokenId = await contract._nextTokenId();
+        console.log("Next Token ID:", nextTokenId.toString()); // Debugging log
 
         const ownedNFTs = [];
 
-        // Loop through the balance and fetch token data
-        for (let i = 0; i < balance.toNumber(); i++) {
-          const tokenId = await contract.tokenOfOwnerByIndex(account, i);
-          console.log("Fetching Token ID:", tokenId.toString()); // Debugging log
+        // Loop through token IDs (from 0 to nextTokenId - 1)
+        for (let tokenId = 0; tokenId < nextTokenId.toNumber(); tokenId++) {
+          try {
+            const owner = await contract.ownerOf(tokenId);
+            if (owner.toLowerCase() === account.toLowerCase()) {
+              const tokenURI = await contract.tokenURI(tokenId);
+              const response = await fetch(tokenURI);
+              const metadata = await response.json();
 
-          const tokenURI = await contract.tokenURI(tokenId);
-          console.log("Token URI:", tokenURI); // Debugging log
-
-          const response = await fetch(tokenURI);
-          const metadata = await response.json();
-
-          ownedNFTs.push({
-            tokenId: tokenId.toString(),
-            ...metadata,
-          });
+              ownedNFTs.push({
+                tokenId: tokenId.toString(),
+                ...metadata,
+              });
+            }
+          } catch (err) {
+            // If an error occurs, it means the token doesn't exist or isn't owned by the user
+            continue;
+          }
         }
 
         setNFTs(ownedNFTs);
