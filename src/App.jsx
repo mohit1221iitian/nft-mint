@@ -1,12 +1,13 @@
 import React, { useState } from "react";
 import { ethers } from "ethers";
 import ABI from "./assets/abis.json";
-import NFTGallery from "./NFTGallery"; // Correct import for NFTGallery
+import NFTGallery from "./NFTGallery";
 
 const contractAddress = "0x8e6Bd6d4557f78F44b75C57873D0eb0627C1a0DF";
 
 function App() {
   const [account, setAccount] = useState(null);
+  const [showGallery, setShowGallery] = useState(false); // State to control gallery visibility
 
   const connectWallet = async () => {
     try {
@@ -40,6 +41,10 @@ function App() {
     }
   };
 
+  const toggleGallery = () => {
+    setShowGallery(!showGallery); // Toggle the gallery view
+  };
+
   return (
     <div style={{ textAlign: "center", marginTop: "50px" }}>
       <h1>Gunani NFT Minter</h1>
@@ -47,7 +52,13 @@ function App() {
         <>
           <p>Connected: {account}</p>
           <button onClick={mintNFT}>Mint NFT</button>
-          <NFTGallery account={account} /> {/* Display gallery when connected */}
+          {/* Toggle button for showing/hiding the gallery */}
+          <button onClick={toggleGallery}>
+            {showGallery ? "Hide NFT Gallery" : "View NFT Gallery"}
+          </button>
+          
+          {/* Conditionally render the NFT Gallery */}
+          {showGallery && <NFTGallery account={account} />}
         </>
       ) : (
         <button onClick={connectWallet}>Connect Wallet</button>
